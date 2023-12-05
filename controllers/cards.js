@@ -28,7 +28,7 @@ module.exports.getCards = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   if (req.params.cardId.length === 24) {
-    Card.findByIdAndRemove(req.params.cardId)
+    Card.findByIdAndDelete(req.params.cardId)
       .then((card) => {
         if (!card) {
           res.status(404).send({ message: 'Карточка с указанным _id не найдена' });

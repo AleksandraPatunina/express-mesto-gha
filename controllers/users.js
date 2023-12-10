@@ -3,6 +3,7 @@ const User = require('../models/user');
 const ServerErrorCode = 500;
 const ClientErrorCode = 400;
 const NotFoundCode = 404;
+const Success = 201;
 const IncorrectUserId = 'Некорректный _id';
 const ServerErrorMessage = 'На сервере произошла ошибка';
 const NotFoundUserMessage = 'Пользователь по данному _id не найден';
@@ -52,7 +53,7 @@ module.exports.getUserById = (req, res) => {
 module.exports.addUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then((user) => res.status(201).send(user))
+    .then((user) => res.status(Success).send(user))
     .catch((error) => {
       if (error.name === 'ValidationError') {
         res.status(ClientErrorCode).send({ message: error.message });

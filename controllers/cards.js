@@ -4,6 +4,7 @@ const Card = require('../models/card');
 const ServerErrorCode = 500;
 const ClientErrorCode = 400;
 const NotFoundCode = 404;
+const SuccessCard = 201;
 const IncorrectId = 'Некорректный _id';
 const ServerErrorMessage = 'На сервере произошла ошибка';
 const NotFoundMessage = 'Карточка с указанным _id не найдена';
@@ -23,7 +24,7 @@ module.exports.addCard = (req, res) => {
     .then((card) => {
       Card.findById(card._id)
         .populate('owner')
-        .then((data) => res.status(201).send(data))
+        .then((data) => res.status(SuccessCard).send(data))
         .catch(() => res.status(ServerErrorCode).send({ message: ServerErrorMessage }));
     })
     .catch((error) => {

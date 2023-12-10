@@ -17,7 +17,7 @@ module.exports.getUsers = (req, res) => {
 // Middleware для валидации _id пользователя
 module.exports.CastError = (req, res, next) => {
   if (req.params.userId.length !== 24) {
-    return res.status(NotFoundCode).send({ message: IncorrectUserId });
+    return res.status(ClientErrorCode).send({ message: IncorrectUserId }); // исправила
   }
   return next(); // передаю управление следующему обработчику-контроллеру
 };
@@ -25,7 +25,7 @@ module.exports.getUserById = (req, res) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        return res.status(ClientErrorCode).send({ message: IncorrectUserId }); // исправила
+        return res.status(NotFoundCode).send({ message: NotFoundUserMessage });
       }
       return res.send(user);
     })

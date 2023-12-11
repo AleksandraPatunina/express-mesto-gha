@@ -1,4 +1,5 @@
 // const card = require('../models/card');
+const mongoose = require('mongoose');
 const Card = require('../models/card');
 
 const ServerErrorCode = 500;
@@ -11,11 +12,12 @@ const NotFoundMessage = 'Карточка с указанным _id не най�
 const CardDeleteMessage = 'Карточка удалена';
 
 // Middleware для валидации _id карточки
-module.exports.CastError = (req, res, next) => {
-  if (req.params.cardId.length !== 24) {
+// CastError - Ошибка валидации. Возникает, когда передан невалидный ID.
+module.exports.CastError = ({ params: { cardId } }, res, next) => {
+  if (!mongoose.Types.ObjectId.isValid(cardId)) {
     return res.status(ClientErrorCode).send({ message: IncorrectId });
   }
-  return next(); // передаю управление следующему обработчику-контроллеру
+  return next();
 };
 
 module.exports.addCard = (req, res) => {
@@ -51,11 +53,15 @@ module.exports.deleteCard = (req, res) => {
       }
       return res.send({ message: CardDeleteMessage });
     })
-    .catch(() => res.status(ServerErrorCode).send({ message: ServerErrorMessage }));
+    .catch((error) => {
+      if (error.name === 'CastError') {
+        return res.status(ClientErrorCode).send({ message: IncorrectId });
+      }
+      return res.status(ServerErrorCode).send({ message: ServerErrorMessage });
+    });
 };
 
 module.exports.likeCard = (req, res) => {
-  // в params лежит id карточки
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
     .populate(['owner', 'likes'])
     .then((card) => {
@@ -64,7 +70,12 @@ module.exports.likeCard = (req, res) => {
       }
       return res.send(card);
     })
-    .catch(() => res.status(ServerErrorCode).send({ message: ServerErrorMessage }));
+    .catch((error) => {
+      if (error.name === 'CastError') {
+        return res.status(ClientErrorCode).send({ message: IncorrectId });
+      }
+      return res.status(ServerErrorCode).send({ message: ServerErrorMessage });
+    });
 };
 
 module.exports.dislikeCard = (req, res) => {
@@ -76,57 +87,10 @@ module.exports.dislikeCard = (req, res) => {
       }
       return res.send(card);
     })
-    .catch(() => res.status(ServerErrorCode).send({ message: ServerErrorMessage }));
+    .catch((error) => {
+      if (error.name === 'CastError') {
+        return res.status(ClientErrorCode).send({ message: IncorrectId });
+      }
+      return res.status(ServerErrorCode).send({ message: ServerErrorMessage });
+    });
 };
-
-// module.exports.deleteCard = (req, res) => {
-//   if (req.params.cardId.length === 24) {
-//     Card.findByIdAndDelete(req.params.cardId)
-//       .then((card) => {
-//         if (!card) {
-//           res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
-//           return;
-//         }
-//         res.send({ message: 'Карточка удалена' });
-//       })
-//       .catch(() => res.status(404).send({ message: 'Карточка с указанным _id не найдена' }));
-//   } else {
-//     res.status(400).send({ message: ' Некорректный _id для карточки' });
-//   }
-// };
-
-// module.exports.likeCard = (req, res) => {
-//   if (req.params.cardId.length === 24) {
-//     // в params лежит id карточки
-//     Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } },
-// { new: true })
-//       .populate(['owner', 'likes'])
-//       .then((card) => {
-//         if (!card) {
-//           res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
-//           return;
-//         }
-//         res.send(card);
-//       })
-//       .catch(() => res.status(404).send({ message: 'Карточка с указанным _id не найдена' }));
-//   } else {
-//     res.status(400).send({ message: 'Некорректный _id карточки' });
-//   }
-// };
-
-// module.exports.dislikeCard = (req, res) => {
-//   if (req.params.cardId.length === 24) {
-//     Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
-//       .populate(['owner', 'likes'])
-//       .then((card) => {
-//         if (!card) {
-//           res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
-//           return;
-//         }
-//         res.send(card);
-//       })
-//       .catch(() => res.status(404).send({ message: 'Карточка с указанным _id не найдена' }));
-//   } else {
-//     res.status(400).send({ message: 'Некорректный _id карточки' });
-//   }
-// };

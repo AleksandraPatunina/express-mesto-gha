@@ -1,10 +1,10 @@
 const router = require('express').Router();
 const {
-  getUsers, getUserById, addUser, editUserData, editUserAvatar, CastError,
+  getUsers, getUserById, addUser, editUserData, editUserAvatar,
 } = require('../controllers/users');
 
 router.get('/', getUsers);
-router.get('/:userId', CastError, getUserById);
+router.get('/:userId', getUserById);
 router.post('/', addUser);
 router.patch('/me', editUserData);
 router.patch('/me/avatar', editUserAvatar);
@@ -16,3 +16,13 @@ module.exports = router;
 // POST /users — создаёт пользователя
 // PATCH /users/me — обновляет профиль
 // PATCH /users/me/avatar — обновляет аватар
+
+// const {
+//   getUsers, getUserById, addUser, editUserData, editUserAvatar, CastError,
+// } = require('../controllers/users');
+
+// router.get('/', getUsers);
+// router.get('/:userId', CastError, getUserById);
+// router.post('/', addUser);
+// router.patch('/me', editUserData);
+// router.patch('/me/avatar', editUserAvatar);

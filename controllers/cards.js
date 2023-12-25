@@ -6,18 +6,6 @@ const Card = require('../models/card');
 // ошибки
 const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
-//const ForbiddenError = require('../errors/ForbiddenError');
-// const ServerErrorCode = 500;
-// const ClientErrorCode = 400;
-// const NotFoundCode = 404;
-// const SuccessCard = 201;
-// const IncorrectId = 'Некорректный _id';
-// const ServerErrorMessage = 'На сервере произошла ошибка';
-// const NotFoundMessage = 'Карточка с указанным _id не найдена';
-// const CardDeleteMessage = 'Карточка удалена';
-
-// Middleware для валидации _id карточки
-// CastError - Ошибка валидации. Возникает, когда передан невалидный ID.
 
 module.exports.addCard = (req, res, next) => {
   const { name, link } = req.body;

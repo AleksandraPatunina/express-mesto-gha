@@ -1,23 +1,8 @@
 const { HTTP_STATUS_OK, HTTP_STATUS_CREATED } = require('http2').constants;
 const mongoose = require('mongoose');
 const User = require('../models/user');
-// const bcrypt = require('bcryptjs');
-// const jwt = require('jsonwebtoken');
-// Подключаем модуль httpConstants
-
-// const { SECRET_KEY = 'mesto-test' } = process.env;
 const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
-// const ConflictError = require('../errors/ConflictError');
-
-// const ServerErrorCode = 500;
-// const ClientErrorCode = 400;
-// const NotFoundCode = 404;
-// const Success = 201;
-// const IncorrectUserId = 'Некорректный _id';
-// const ServerErrorMessage = 'На сервере произошла ошибка';
-// const NotFoundUserMessage = 'Пользователь по данному _id не найден';
-
 // выводим всех пользователей:
 module.exports.getUsers = (req, res, next) => {
   User.find({})

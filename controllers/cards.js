@@ -40,10 +40,10 @@ module.exports.getCards = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findById(req.params.cardId)
+  Card.findByIdAndDelete(req.params.cardId)
     .orFail()
-    .then(() => {
-      res.status(HTTP_STATUS_OK).send({ message: 'Карточка удалена' });
+    .then((card) => {
+      res.status(HTTP_STATUS_OK).send({ message: 'Карточка удалена', card });
     })
     .catch((error) => {
       if (error instanceof mongoose.Error.DocumentNotFoundError) {

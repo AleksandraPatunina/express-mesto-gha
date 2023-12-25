@@ -16,13 +16,3 @@ module.exports = router;
 // POST /users — создаёт пользователя
 // PATCH /users/me — обновляет профиль
 // PATCH /users/me/avatar — обновляет аватар
-
-// const {
-//   getUsers, getUserById, addUser, editUserData, editUserAvatar, CastError,
-// } = require('../controllers/users');
-
-// router.get('/', getUsers);
-// router.get('/:userId', CastError, getUserById);
-// router.post('/', addUser);
-// router.patch('/me', editUserData);
-// router.patch('/me/avatar', editUserAvatar);

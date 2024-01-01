@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { regexForUrl } = require('../utils/constants');
 
 const cardSchema = new mongoose.Schema({
   //  имя карточки
@@ -15,7 +16,7 @@ const cardSchema = new mongoose.Schema({
     validate: {
       // взято  с сайта https://uibakery.io/regex-library/url
       validator(url) {
-        return /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/.test(url);
+        return regexForUrl.test(url);
       },
       message: 'Неправильно введен URL',
     },

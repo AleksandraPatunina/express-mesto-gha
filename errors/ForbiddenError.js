@@ -1,4 +1,4 @@
-// номер ошибки 403
+// код ошибки 403
 const { HTTP_STATUS_FORBIDDEN } = require('http2').constants;
 
 module.exports = class NotfoundError extends Error {

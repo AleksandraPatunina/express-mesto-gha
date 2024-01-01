@@ -1,18 +1,19 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
-const { regexForUrl } = require('../utils/constants');
+const { urlRegex } = require('../utils/constants');
 const {
-  getUsers, getUserById, editUserData, editUserAvatar, getAboutMeUser,
+  getUsers, getUserById, editUserData, editUserAvatar, getMeUser,
 } = require('../controllers/users');
 
 router.get('/', getUsers);
-router.get('/me', getAboutMeUser);
+
+router.get('/me', getMeUser);
+
 router.get('/:userId', celebrate({
   params: Joi.object().keys({
     userId: Joi.string().length(24).hex().required(),
   }),
 }), getUserById);
-// router.post('/', addUser);
 
 router.patch('/me', celebrate({
   body: Joi.object().keys({
@@ -23,7 +24,7 @@ router.patch('/me', celebrate({
 
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().pattern(regexForUrl),
+    avatar: Joi.string().pattern(urlRegex),
   }),
 }), editUserAvatar);
 

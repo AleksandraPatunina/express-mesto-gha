@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
-const { regexForUrl } = require('../utils/constants');
+const { urlRegex } = require('../utils/constants');
 const {
   addCard, getCards, deleteCard, likeCard, dislikeCard,
 } = require('../controllers/cards');
@@ -16,7 +16,7 @@ router.delete('/:cardId', celebrate({
 router.post('/', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().pattern(regexForUrl),
+    link: Joi.string().required().pattern(urlRegex),
   }),
 }), addCard);
 
@@ -33,9 +33,3 @@ router.delete('/:cardId/likes', celebrate({
 }), dislikeCard);
 
 module.exports = router;
-
-// GET /cards — возвращает все карточки
-// POST /cards — создаёт карточку
-// DELETE /cards/:cardId — удаляет карточку по идентификатору
-// PUT /cards/:cardId/likes — поставить лайк карточке
-// DELETE /cards/:cardId/likes — убрать лайк с карточки

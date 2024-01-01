@@ -1,5 +1,6 @@
-// middleware, которая будет защищать роуты: проверять, авторизован ли пользователь и защищать
 const jwt = require('jsonwebtoken');
+
+const { SECRET_KEY = 'mesto-test' } = process.env;
 const UnautorizedError = require('../errors/UnautorizedError');
 
 module.exports = (req, res, next) => {
@@ -13,7 +14,7 @@ module.exports = (req, res, next) => {
   let payload;
 
   try {
-    payload = jwt.verify(token, 'mesto secret key');
+    payload = jwt.verify(token, SECRET_KEY);
   } catch (err) {
     throw new UnautorizedError('Необходима авторизация');
   }

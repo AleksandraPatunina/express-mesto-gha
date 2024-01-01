@@ -1,35 +1,30 @@
 const mongoose = require('mongoose');
-// const validator = require('validator');
 const bcrypt = require('bcryptjs');
-// const { default: isEmail } = require('validator/lib/isEmail');
 const UnautorizedError = require('../errors/UnautorizedError');
-const { regexForUrl } = require('../utils/constants');
-const { regexForEmail } = require('../utils/constants');
+const { urlRegex, emailRegex } = require('../utils/constants');
 
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
+    minlength: [2, 'Минимальная длина поля - 2'],
+    maxlength: [30, 'Максимальная длина поля - 30'],
     default: 'Жак-Ив Кусто',
-    minlength: [2, 'Минимальная длина поля "name" — 2 символа'],
-    maxlength: [30, 'Максимальная длина поля "name"— 30 символов'],
   },
   about: {
     type: String,
+    minlength: [2, 'Минимальная длина поля - 2'],
+    maxlength: [30, 'Максимальная длина поля - 30'],
     default: 'Исследователь',
-    required: [true, 'Поле "about" должно быть заполнено'],
-    minlength: [2, 'Минимальная длина поля "about" — 2 символа'],
-    maxlength: [30, 'Максимальная длина поля "about" — 30 символов'],
   },
   avatar: {
     type: String,
-    default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     validate: {
-      // взято  с сайта https://uibakery.io/regex-library/url
       validator(url) {
-        return regexForUrl.test(url);
+        return urlRegex.test(url);
       },
-      message: 'Неправильно введен URL',
+      message: 'Введите URL',
     },
+    default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
   },
   email: {
     type: String,
@@ -37,10 +32,9 @@ const userSchema = new mongoose.Schema({
     unique: true,
     validate: {
       validator(email) {
-        // return isEmail(email);
-        return regexForEmail.test(email);
+        return emailRegex.test(email);
       },
-      message: 'Введите правильный email',
+      message: 'Введите верный email',
     },
   },
   password: {
@@ -50,21 +44,19 @@ const userSchema = new mongoose.Schema({
   },
 }, { versionKey: false });
 
-userSchema.statics.findUserByCredentials = function findUserByCredentials(email, password) {
+userSchema.statics.findUserByCredentials = async function findUserByCredentials(email, password) {
   return this.findOne({ email })
     .select('+password')
     .then((user) => {
       if (!user) {
-        throw new UnautorizedError('Неправильно введена почта или пароль'); // обрываемся и ошибку передаем в catch
+        throw new UnautorizedError('Неправильные почта или пароль');
       }
-
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            throw new UnautorizedError('Неправильно введена почта или пароль');
+            throw new UnautorizedError('Неправильные почта или пароль');
           }
-
-          return user; // теперь user доступен
+          return user;
         });
     });
 };

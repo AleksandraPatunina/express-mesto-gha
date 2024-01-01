@@ -1,9 +1,6 @@
-// const card = require('../models/card');
 const { HTTP_STATUS_OK, HTTP_STATUS_CREATED } = require('http2').constants;
 const mongoose = require('mongoose');
 const Card = require('../models/card');
-
-// ошибки
 const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
 const ForbiddenError = require('../errors/ForbiddenError');
@@ -16,19 +13,19 @@ module.exports.addCard = (req, res, next) => {
         .orFail()
         .populate('owner')
         .then((data) => res.status(HTTP_STATUS_CREATED).send(data))
-        .catch((error) => {
-          if (error instanceof mongoose.Error.DocumentNotFoundError) {
+        .catch((err) => {
+          if (err instanceof mongoose.Error.DocumentNotFoundError) {
             next(new NotFoundError('Карточка с указанным _id не найдена.'));
           } else {
-            next(error);
+            next(err);
           }
         });
     })
-    .catch((error) => {
-      if (error instanceof mongoose.Error.ValidationError) {
-        next(new BadRequestError(error.message));
+    .catch((err) => {
+      if (err instanceof mongoose.Error.ValidationError) {
+        next(new BadRequestError(err.message));
       } else {
-        next(error);
+        next(err);
       }
     });
 };
@@ -44,26 +41,26 @@ module.exports.deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((card) => {
       if (!card.owner.equals(req.user._id)) {
-        throw new ForbiddenError('Карточка принадлежит другому пользователю');
+        throw new ForbiddenError('Карточка другого пользовател');
       }
       Card.deleteOne(card)
         .orFail()
         .then(() => {
           res.status(HTTP_STATUS_OK).send({ message: 'Карточка удалена' });
         })
-        .catch((error) => {
-          if (error instanceof mongoose.Error.DocumentNotFoundError) {
+        .catch((err) => {
+          if (err instanceof mongoose.Error.DocumentNotFoundError) {
             next(new NotFoundError(`Карточка с _id: ${req.params.cardId} не найдена.`));
-          } else if (error instanceof mongoose.Error.CastError) {
+          } else if (err instanceof mongoose.Error.CastError) {
             next(new BadRequestError(`Некорректный _id карточки: ${req.params.cardId}`));
           } else {
-            next(error);
+            next(err);
           }
         });
     })
     .catch((err) => {
       if (err.name === 'TypeError') {
-        next(new NotFoundError(`Карточка с _id: ${req.params.cardId} не найдена в БД.`));
+        next(new NotFoundError(`Карточка с _id: ${req.params.cardId} не найдена.`));
       } else {
         next(err);
       }
@@ -77,13 +74,13 @@ module.exports.likeCard = (req, res, next) => {
     .then((card) => {
       res.status(HTTP_STATUS_OK).send(card);
     })
-    .catch((error) => {
-      if (error instanceof mongoose.Error.DocumentNotFoundError) {
+    .catch((err) => {
+      if (err instanceof mongoose.Error.DocumentNotFoundError) {
         next(new NotFoundError(`Карточка с _id: ${req.params.cardId} не найдена.`));
-      } else if (error instanceof mongoose.Error.CastError) {
+      } else if (err instanceof mongoose.Error.CastError) {
         next(new BadRequestError(`Некорректный _id карточки: ${req.params.cardId}`));
       } else {
-        next(error);
+        next(err);
       }
     });
 };
@@ -95,13 +92,13 @@ module.exports.dislikeCard = (req, res, next) => {
     .then((card) => {
       res.status(HTTP_STATUS_OK).send(card);
     })
-    .catch((error) => {
-      if (error instanceof mongoose.Error.DocumentNotFoundError) {
+    .catch((err) => {
+      if (err instanceof mongoose.Error.DocumentNotFoundError) {
         next(new NotFoundError(`Карточка с _id: ${req.params.cardId} не найдена.`));
-      } else if (error instanceof mongoose.Error.CastError) {
+      } else if (err instanceof mongoose.Error.CastError) {
         next(new BadRequestError(`Некорректный _id карточки: ${req.params.cardId}`));
       } else {
-        next(error);
+        next(err);
       }
     });
 };

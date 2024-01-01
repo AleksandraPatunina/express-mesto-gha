@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const { SECRET_KEY = 'mesto-test' } = process.env;
+const { SECRET_KEY = 'mesto secret key' } = process.env;
 const UnautorizedError = require('../errors/UnautorizedError');
 
 module.exports = (req, res, next) => {
@@ -15,7 +15,7 @@ module.exports = (req, res, next) => {
 
   try {
     payload = jwt.verify(token, SECRET_KEY);
-  } catch (err) {
+  } catch (error) {
     throw new UnautorizedError('Необходима авторизация');
   }
   req.user = payload;

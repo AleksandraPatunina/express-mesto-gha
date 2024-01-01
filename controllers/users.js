@@ -1,11 +1,9 @@
-/* Обработка ошибок mongoose.Error.ValidationError принимает err.message,
-это не дефолтный текст, а текст описсаный в схеме */
 const { HTTP_STATUS_OK, HTTP_STATUS_CREATED } = require('http2').constants;
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const { SECRET_KEY = 'mesto-test' } = process.env;
+const { SECRET_KEY = 'mesto secret key' } = process.env;
 const User = require('../models/user');
 const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
@@ -29,13 +27,13 @@ module.exports.getUserById = (req, res, next) => {
     .then((user) => {
       res.status(HTTP_STATUS_OK).send(user);
     })
-    .catch((err) => {
-      if (err instanceof mongoose.Error.CastError) {
+    .catch((error) => {
+      if (error instanceof mongoose.Error.CastError) {
         next(new BadRequestError(`Некорректный _id: ${req.params.userId}`));
-      } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
+      } else if (error instanceof mongoose.Error.DocumentNotFoundError) {
         next(new NotFoundError(`Пользователь по указанному _id: ${req.params.userId} не найден.`));
       } else {
-        next(err);
+        next(error);
       }
     });
 };
@@ -45,13 +43,13 @@ module.exports.editUserData = (req, res, next) => {
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: 'true', runValidators: true })
     .orFail()
     .then((user) => res.status(HTTP_STATUS_OK).send(user))
-    .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        next(new BadRequestError(err.message));
-      } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
+    .catch((error) => {
+      if (error instanceof mongoose.Error.ValidationError) {
+        next(new BadRequestError(error.message));
+      } else if (error instanceof mongoose.Error.DocumentNotFoundError) {
         next(new NotFoundError(`Пользователь по указанному _id: ${req.user._id} не найден.`));
       } else {
-        next(err);
+        next(error);
       }
     });
 };
@@ -60,13 +58,13 @@ module.exports.editUserAvatar = (req, res, next) => {
   User.findByIdAndUpdate(req.user._id, { avatar: req.body.avatar }, { new: 'true', runValidators: true })
     .orFail()
     .then((user) => res.status(HTTP_STATUS_OK).send(user))
-    .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        next(new BadRequestError(err.message));
-      } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
+    .catch((error) => {
+      if (error instanceof mongoose.Error.ValidationError) {
+        next(new BadRequestError(error.message));
+      } else if (error instanceof mongoose.Error.DocumentNotFoundError) {
         next(new NotFoundError(`Пользователь по указанному _id: ${req.user._id} не найден.`));
       } else {
-        next(err);
+        next(error);
       }
     });
 };
@@ -82,13 +80,13 @@ module.exports.addUser = (req, res, next) => {
       .then((user) => res.status(HTTP_STATUS_CREATED).send({
         name: user.name, about: user.about, avatar: user.avatar, _id: user._id, email: user.email,
       }))
-      .catch((err) => {
-        if (err.code === 11000) {
+      .catch((error) => {
+        if (error.code === 11000) {
           next(new ConflictError(`Пользователь с email: ${email} уже зарегистрирован`));
-        } else if (err instanceof mongoose.Error.ValidationError) {
-          next(new BadRequestError(err.message));
+        } else if (error instanceof mongoose.Error.ValidationError) {
+          next(new BadRequestError(error.message));
         } else {
-          next(err);
+          next(error);
         }
       }));
 };
@@ -100,7 +98,7 @@ module.exports.login = (req, res, next) => {
       const token = jwt.sign({ _id: user._id }, SECRET_KEY, { expiresIn: '7d' });
       res.send({ token });
     })
-    .catch((err) => {
-      next(err);
+    .catch((error) => {
+      next(error);
     });
 };
